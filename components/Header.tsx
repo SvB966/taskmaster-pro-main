@@ -1,6 +1,6 @@
 import React from 'react';
 import { MONTHS } from '../types';
-import { ChevronLeft, ChevronRight, Moon, Sun, Layout, BarChart2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Moon, Sun, Layout, BarChart2, Shield } from 'lucide-react';
 
 interface HeaderProps {
   currentDate: Date;
@@ -8,8 +8,8 @@ interface HeaderProps {
   onYearChange: (increment: number) => void;
   darkMode: boolean;
   toggleDarkMode: () => void;
-  currentView: 'calendar' | 'dashboard' | 'taskDetail';
-  setView: (view: 'calendar' | 'dashboard') => void;
+  currentView: 'calendar' | 'dashboard' | 'admin' | 'taskDetail';
+  setView: (view: 'calendar' | 'dashboard' | 'admin') => void;
   onBack?: () => void;
 }
 
@@ -69,6 +69,17 @@ export const Header: React.FC<HeaderProps> = ({
                       `}
                     >
                       <BarChart2 size={16} /> Dashboard
+                    </button>
+                    <button 
+                      onClick={() => setView('admin')}
+                      className={`
+                        flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all
+                        ${currentView === 'admin' 
+                          ? 'bg-white dark:bg-slate-600 text-sky-700 dark:text-white shadow-sm' 
+                          : 'text-sky-100 hover:bg-sky-700/50 dark:text-slate-300 dark:hover:bg-slate-600/50'}
+                      `}
+                    >
+                      <Shield size={16} /> Admin
                     </button>
                   </>
                 )}

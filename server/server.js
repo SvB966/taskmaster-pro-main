@@ -27,10 +27,18 @@ async function initializeDb() {
       endTime TEXT,
       subtasks TEXT,
       status TEXT,
+      archived INTEGER DEFAULT 0,
       createdAt INTEGER,
       updatedAt INTEGER
     )
   `);
+
+  // Ensure archived column exists for existing databases without dropping data
+  const columns = await db.all("PRAGMA table_info(tasks)");
+  const hasArchived = columns.some(col => col.name === 'archived');
+  if (!hasArchived) {
+    await db.exec('ALTER TABLE tasks ADD COLUMN archived INTEGER DEFAULT 0');
+  }
   console.log('Database connected and initialized');
 }
 
@@ -43,7 +51,8 @@ app.get('/api/tasks', async (req, res) => {
     const tasks = await db.all('SELECT * FROM tasks');
     const parsedTasks = tasks.map(t => ({
       ...t,
-      subtasks: JSON.parse(t.subtasks || '[]')
+      subtasks: JSON.parse(t.subtasks || '[]'),
+      archived: Boolean(t.archived)
     }));
     res.json(parsedTasks);
   } catch (e) {
@@ -54,11 +63,11 @@ app.get('/api/tasks', async (req, res) => {
 app.post('/api/tasks', async (req, res) => {
   try {
     const task = req.body;
-    const { id, title, description, date, startTime, endTime, subtasks, status, createdAt, updatedAt } = task;
+    const { id, title, description, date, startTime, endTime, subtasks, status, archived = false, createdAt, updatedAt } = task;
     await db.run(
-      `INSERT INTO tasks (id, title, description, date, startTime, endTime, subtasks, status, createdAt, updatedAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [id, title, description, date, startTime, endTime, JSON.stringify(subtasks), status, createdAt, updatedAt]
+      `INSERT INTO tasks (id, title, description, date, startTime, endTime, subtasks, status, archived, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ,[id, title, description, date, startTime, endTime, JSON.stringify(subtasks), status, archived ? 1 : 0, createdAt, updatedAt]
     );
     res.status(201).json(task);
   } catch (e) {
@@ -70,11 +79,11 @@ app.put('/api/tasks/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const task = req.body;
-    const { title, description, date, startTime, endTime, subtasks, status, updatedAt } = task;
+    const { title, description, date, startTime, endTime, subtasks, status, archived = false, updatedAt } = task;
     
     await db.run(
-      `UPDATE tasks SET title = ?, description = ?, date = ?, startTime = ?, endTime = ?, subtasks = ?, status = ?, updatedAt = ? WHERE id = ?`,
-      [title, description, date, startTime, endTime, JSON.stringify(subtasks), status, updatedAt, id]
+      `UPDATE tasks SET title = ?, description = ?, date = ?, startTime = ?, endTime = ?, subtasks = ?, status = ?, archived = ?, updatedAt = ? WHERE id = ?`,
+      [title, description, date, startTime, endTime, JSON.stringify(subtasks), status, archived ? 1 : 0, updatedAt, id]
     );
     res.json(task);
   } catch (e) {

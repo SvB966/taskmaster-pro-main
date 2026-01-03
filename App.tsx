@@ -5,6 +5,7 @@ import { Calendar } from './components/Calendar';
 import { TaskPanel } from './components/TaskPanel';
 import { TaskDetail } from './components/TaskDetail';
 import { Dashboard } from './components/Dashboard';
+import { Admin } from './components/Admin';
 import { Task } from './types';
 import { taskService } from './services/taskService';
 
@@ -17,7 +18,7 @@ export default function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentView, setCurrentView] = useState<'calendar' | 'dashboard' | 'taskDetail'>('calendar');
+  const [currentView, setCurrentView] = useState<'calendar' | 'dashboard' | 'admin' | 'taskDetail'>('calendar');
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
   // Dark Mode State
@@ -185,6 +186,14 @@ export default function App() {
               />
             </div>
           </>
+        ) : currentView === 'admin' ? (
+          <div className="w-full h-full">
+            <Admin 
+              tasks={tasks}
+              onUpdate={handleUpdateTask}
+              onDelete={handleDeleteTask}
+            />
+          </div>
         ) : (
           /* Dashboard View */
           <div className="w-full h-full">

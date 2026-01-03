@@ -15,6 +15,7 @@ export const taskService = {
       // Ensure defaults if not provided (handling legacy calls or partial objects)
       endTime: task.endTime || calculateDefaultEndTime(task.startTime),
       subtasks: task.subtasks || [],
+      archived: task.archived ?? false,
       id: crypto.randomUUID(),
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -31,7 +32,7 @@ export const taskService = {
   },
 
   updateTask: async (updatedTask: Task): Promise<Task> => {
-    const taskToUpdate = { ...updatedTask, updatedAt: Date.now() };
+    const taskToUpdate = { ...updatedTask, archived: updatedTask.archived ?? false, updatedAt: Date.now() };
     const response = await fetch(`${API_URL}/${updatedTask.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

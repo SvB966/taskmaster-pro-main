@@ -19,6 +19,7 @@ export interface Task {
   endTime: string; // HH:MM
   subtasks: Subtask[];
   status: TaskStatus;
+  archived?: boolean;
   createdAt: number;
   updatedAt: number;
 }
