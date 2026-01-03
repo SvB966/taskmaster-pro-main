@@ -1,0 +1,5 @@
+{
+  "name": "TaskMaster Pro",
+  "description": "A robust task management application featuring a calendar view, task scheduling, and status tracking, inspired by classic productivity tools.",
+  "requestFramePermissions": []
+}
